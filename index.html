@@ -5,160 +5,399 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>ESP32 Smart Medicine Dispenser</title>
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      text-align: center;
-      background-color: #f4f8ff;
+    :root {
+      --primary: #0078d7;
+      --primary-dark: #005ea0;
+      --success: #28a745;
+      --danger: #dc3545;
+      --warning: #ffc107;
+      --dark: #343a40;
+      --light: #f8f9fa;
+      --gray: #6c757d;
+    }
+
+    * {
+      box-sizing: border-box;
       margin: 0;
       padding: 0;
     }
 
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      padding: 20px;
+    }
+
+    .container {
+      max-width: 1000px;
+      margin: 0 auto;
+    }
+
     h1 {
-      color: #0078d7;
-      margin-top: 40px;
+      color: white;
+      text-align: center;
+      margin-bottom: 30px;
+      font-size: 2.5rem;
+      text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
     }
 
     /* Login Page */
     #loginForm {
-      max-width: 380px;
+      max-width: 400px;
       margin: 100px auto;
-      background: #fff;
-      padding: 30px 25px;
-      border-radius: 15px;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+      background: white;
+      padding: 40px;
+      border-radius: 20px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.2);
     }
-    #loginForm input {
+
+    .form-group {
+      margin-bottom: 20px;
+      text-align: left;
+    }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 8px;
+      color: var(--dark);
+      font-weight: 600;
+    }
+
+    .form-control {
       width: 100%;
-      padding: 12px;
-      margin: 8px 0;
-      border: 1.5px solid #ccc;
+      padding: 14px;
+      border: 2px solid #e9ecef;
       border-radius: 10px;
       font-size: 1rem;
+      transition: border-color 0.3s ease;
     }
-    #loginForm button {
+
+    .form-control:focus {
+      outline: none;
+      border-color: var(--primary);
+    }
+
+    .btn {
       width: 100%;
-      background-color: #0078d7;
-      color: white;
-      padding: 12px;
+      padding: 14px;
       border: none;
       border-radius: 10px;
       font-size: 1rem;
+      font-weight: 600;
       cursor: pointer;
+      transition: all 0.3s ease;
     }
-    #loginForm button:hover {
-      background-color: #005ea0;
+
+    .btn-primary {
+      background-color: var(--primary);
+      color: white;
+    }
+
+    .btn-primary:hover {
+      background-color: var(--primary-dark);
+      transform: translateY(-2px);
     }
 
     /* Dashboard */
     #dashboard {
       display: none;
-      padding-bottom: 60px;
+    }
+
+    .header-bar {
+      background: white;
+      padding: 20px;
+      border-radius: 15px;
+      margin-bottom: 30px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .user-info h3 {
+      color: var(--dark);
+      margin-bottom: 5px;
+    }
+
+    #connectionStatus {
+      color: var(--danger);
+      font-weight: 600;
+    }
+
+    .btn-dark {
+      background-color: var(--dark);
+      color: white;
+      padding: 10px 20px;
+    }
+
+    .btn-dark:hover {
+      background-color: #23272b;
+      transform: translateY(-2px);
     }
 
     .card-container {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
-      gap: 20px;
-      margin-top: 30px;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 25px;
+      margin-bottom: 30px;
     }
 
     .card {
       background: white;
       border-radius: 15px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-      width: 250px;
-      padding: 20px;
-      transition: 0.3s ease;
+      padding: 30px;
+      box-shadow: 0 6px 20px rgba(0,0,0,0.1);
+      transition: all 0.3s ease;
+      text-align: center;
     }
-    .card:hover { transform: translateY(-5px); }
+
+    .card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+    }
+
+    .card-icon {
+      font-size: 3rem;
+      margin-bottom: 15px;
+    }
 
     .card h2 {
-      color: #0078d7;
-      margin-bottom: 10px;
+      color: var(--dark);
+      font-size: 1.4rem;
+      margin-bottom: 15px;
     }
 
-    .card p {
-      font-size: 1.1rem;
-      margin: 10px 0;
+    .card-value {
+      font-size: 2.8rem;
+      font-weight: bold;
+      color: var(--primary);
+      margin: 15px 0;
     }
 
-    button {
+    .card-subtitle {
+      color: var(--gray);
+      font-size: 1rem;
+      margin-bottom: 20px;
+    }
+
+    .progress-bar {
+      width: 100%;
+      height: 10px;
+      background: #e9ecef;
+      border-radius: 5px;
+      overflow: hidden;
+      margin: 20px 0;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: var(--primary);
+      border-radius: 5px;
+      transition: width 0.3s ease;
+    }
+
+    .btn-reset {
+      background-color: var(--primary);
+      color: white;
+      padding: 12px 24px;
       border: none;
       border-radius: 8px;
-      padding: 10px 20px;
-      font-size: 16px;
+      font-size: 1rem;
       cursor: pointer;
-      color: white;
+      transition: all 0.3s ease;
+      width: 100%;
       margin-top: 10px;
     }
 
-    .resetBtn { background-color: #0078d7; }
-    .toggleBtn { background-color: #28a745; }
-    .logoutBtn {
-      background-color: #555;
-      margin-top: 30px;
-      padding: 10px 30px;
+    .btn-reset:hover {
+      background-color: var(--primary-dark);
+      transform: translateY(-2px);
+    }
+
+    .status-indicator {
+      display: inline-block;
+      width: 15px;
+      height: 15px;
+      border-radius: 50%;
+      margin-right: 10px;
+    }
+
+    .status-on { background-color: var(--success); }
+    .status-off { background-color: var(--gray); }
+
+    .system-info {
+      background: white;
+      border-radius: 15px;
+      padding: 20px;
+      margin-top: 20px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    }
+
+    .system-info h3 {
+      color: var(--dark);
+      margin-bottom: 15px;
+    }
+
+    .info-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 15px;
+    }
+
+    .info-item {
+      text-align: center;
+      padding: 10px;
+      background: var(--light);
+      border-radius: 8px;
+    }
+
+    .info-label {
+      font-size: 0.9rem;
+      color: var(--gray);
+      margin-bottom: 5px;
+    }
+
+    .info-value {
+      font-size: 1.1rem;
+      font-weight: bold;
+      color: var(--primary);
     }
 
     footer {
-      color: #666;
-      font-size: 0.9rem;
+      text-align: center;
+      color: white;
       margin-top: 40px;
-      padding-bottom: 15px;
+      opacity: 0.8;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .card-container {
+        grid-template-columns: 1fr;
+      }
+      
+      .header-bar {
+        flex-direction: column;
+        gap: 15px;
+        text-align: center;
+      }
+      
+      h1 {
+        font-size: 2rem;
+      }
+      
+      .info-grid {
+        grid-template-columns: 1fr;
+      }
     }
   </style>
 </head>
 <body>
 
-  <h1>ESP32 Smart Medicine Dispenser</h1>
+  <div class="container">
+    <h1>🏥 ESP32 Smart Medicine Dispenser</h1>
 
-  <!-- Login Page -->
-  <div id="loginForm">
-    <input type="email" id="email" placeholder="Enter Email" required />
-    <input type="password" id="password" placeholder="Enter Password" required />
-    <button id="loginBtn">Login</button>
-  </div>
-
-  <!-- Dashboard -->
-  <div id="dashboard">
-    <div class="card-container">
-      <div class="card">
-        <h2>Pill Count</h2>
-        <p>Remaining: <span id="pillCount">Loading...</span></p>
-        <button class="resetBtn" id="resetPillBtn">Reset to 100</button>
+    <!-- Login Page -->
+    <div id="loginForm">
+      <div class="form-group">
+        <label for="email">📧 Email Address</label>
+        <input type="email" id="email" class="form-control" placeholder="Enter your email" required />
       </div>
-
-      <div class="card">
-        <h2>Medicine Solution</h2>
-        <p>Remaining: <span id="medCount">Loading...</span></p>
-        <button class="resetBtn" id="resetMedBtn">Reset to 100</button>
+      <div class="form-group">
+        <label for="password">🔒 Password</label>
+        <input type="password" id="password" class="form-control" placeholder="Enter your password" required />
       </div>
-
-      <div class="card">
-        <h2>LED 1 (Error)</h2>
-        <p>Status: <span id="led0Status">Loading...</span></p>
-        <button class="toggleBtn" id="toggleLed0">Toggle LED 1</button>
-      </div>
-
-      <div class="card">
-        <h2>LED 2 (Success)</h2>
-        <p>Status: <span id="led1Status">Loading...</span></p>
-        <button class="toggleBtn" id="toggleLed1">Toggle LED 2</button>
-      </div>
+      <button id="loginBtn" class="btn btn-primary">🚀 Login to Dashboard</button>
     </div>
 
-    <button class="logoutBtn" id="logoutBtn">Logout</button>
-  </div>
+    <!-- Dashboard -->
+    <div id="dashboard">
+      <div class="header-bar">
+        <div class="user-info">
+          <h3>Welcome, Administrator!</h3>
+          <p id="connectionStatus">🔴 Disconnected from ESP32</p>
+        </div>
+        <button id="logoutBtn" class="btn btn-dark">🚪 Logout</button>
+      </div>
 
-  <footer>Created by Jia Yong — ESP32 Smart Medicine Dispenser</footer>
+      <div class="card-container">
+        <!-- Pill Count Card -->
+        <div class="card">
+          <div class="card-icon">💊</div>
+          <h2>Pill Count</h2>
+          <div class="card-value" id="pillCount">0</div>
+          <div class="card-subtitle">Remaining pills in dispenser (%)</div>
+          <div class="progress-bar">
+            <div class="progress-fill" id="pillProgress" style="width: 0%"></div>
+          </div>
+          <button class="btn-reset" id="resetPillBtn">Reset to 100</button>
+        </div>
+
+        <!-- Medicine Solution Card -->
+        <div class="card">
+          <div class="card-icon">🧴</div>
+          <h2>Medicine Solution</h2>
+          <div class="card-value" id="medCount">0</div>
+          <div class="card-subtitle">Remaining medicine solution (%)</div>
+          <div class="progress-bar">
+            <div class="progress-fill" id="medProgress" style="width: 0%"></div>
+          </div>
+          <button class="btn-reset" id="resetMedBtn">Reset to 100</button>
+        </div>
+
+        <!-- LED 1 Card -->
+        <div class="card">
+          <div class="card-icon">🔴</div>
+          <h2>LED 1 (Error)</h2>
+          <div class="card-value">
+            <span class="status-indicator" id="led0Indicator"></span>
+            <span id="led0Status">OFF</span>
+          </div>
+          <div class="card-subtitle">Error indicator LED status</div>
+        </div>
+
+        <!-- LED 2 Card -->
+        <div class="card">
+          <div class="card-icon">🟢</div>
+          <h2>LED 2 (Success)</h2>
+          <div class="card-value">
+            <span class="status-indicator" id="led1Indicator"></span>
+            <span id="led1Status">OFF</span>
+          </div>
+          <div class="card-subtitle">Success indicator LED status</div>
+        </div>
+      </div>
+
+      <!-- System Information -->
+      <div class="system-info">
+        <h3>📊 System Information</h3>
+        <div class="info-grid">
+          <div class="info-item">
+            <div class="info-label">Current User ID</div>
+            <div class="info-value" id="currentUser">-</div>
+          </div>
+          <div class="info-item">
+            <div class="info-label">Current Mode</div>
+            <div class="info-value" id="currentMode">-</div>
+          </div>
+          <div class="info-item">
+            <div class="info-label">Last Update</div>
+            <div class="info-value" id="lastUpdate">-</div>
+          </div>
+        </div>
+      </div>
+
+      <footer>Created by Jia Yong — ESP32 Smart Medicine Dispenser © 2024</footer>
+    </div>
+  </div>
 
   <!-- Firebase SDK -->
   <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-database-compat.js"></script>
 
   <script>
-    // ✅ Firebase configuration
+    // ✅ Firebase configuration - Using YOUR Firebase project
     const firebaseConfig = {
       apiKey: "AIzaSyBQqm8R39GYyCcalEc7Gx53v_yBnU5m0ZQ",
       authDomain: "esp32---led-ffa10.firebaseapp.com",
@@ -168,76 +407,131 @@
       messagingSenderId: "329234908195",
       appId: "1:329234908195:web:3dd0a2c867bc3d72849d96"
     };
+    
+    // Initialize Firebase
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
 
-    // ✅ Local Login (edit these credentials)
+    // ✅ Authentication
     const allowedEmail = "admin@esp32.com";
     const allowedPassword = "123456";
 
     const loginForm = document.getElementById("loginForm");
     const dashboard = document.getElementById("dashboard");
+    let statusRef = null;
 
-    document.getElementById("loginBtn").addEventListener("click", () => {
+    document.getElementById("loginBtn").addEventListener("click", login);
+    document.getElementById("password").addEventListener("keypress", (e) => {
+      if (e.key === 'Enter') login();
+    });
+
+    function login() {
       const email = document.getElementById("email").value.trim();
       const password = document.getElementById("password").value.trim();
 
-      if (!email || !password) return alert("Please enter both email and password.");
+      if (!email || !password) {
+        alert("Please enter both email and password.");
+        return;
+      }
+
       if (email === allowedEmail && password === allowedPassword) {
-        alert("Login successful!");
         loginForm.style.display = "none";
         dashboard.style.display = "block";
         startDashboard();
       } else {
         alert("Invalid email or password.");
       }
-    });
+    }
 
-    // ✅ Dashboard Logic
+    // ✅ Dashboard Logic - Reading from /device/status
     function startDashboard() {
-      const refs = {
-        pill: db.ref("pill_count"),
-        med: db.ref("med_count"),
-        led0: db.ref("led0"),
-        led1: db.ref("led1")
+      // Listen to the exact path your ESP32 is writing to
+      statusRef = db.ref("/device/status");
+
+      // Monitor Firebase connection status
+      const connectedRef = db.ref(".info/connected");
+      connectedRef.on("value", (snap) => {
+        const isConnected = snap.val();
+        document.getElementById("connectionStatus").textContent = 
+          isConnected ? "🟢 Connected to ESP32" : "🔴 Disconnected from ESP32";
+        document.getElementById("connectionStatus").style.color = 
+          isConnected ? "green" : "red";
+      });
+
+      // Listen for all data changes from the status object
+      statusRef.on("value", (snapshot) => {
+        const data = snapshot.val();
+        if (data) {
+          console.log("📦 Received data from Firebase:", data);
+          
+          // Update pill count
+          const pillCount = data.pill_count || 0;
+          document.getElementById("pillCount").textContent = pillCount;
+          document.getElementById("pillProgress").style.width = `${pillCount}%`;
+          
+          // Update medicine count
+          const medCount = data.med_count || 0;
+          document.getElementById("medCount").textContent = medCount;
+          document.getElementById("medProgress").style.width = `${medCount}%`;
+          
+          // Update LED statuses
+          updateLED("led0Status", "led0Indicator", data.led0);
+          updateLED("led1Status", "led1Indicator", data.led1);
+          
+          // Update system information
+          document.getElementById("currentUser").textContent = data.current_user || "Unknown";
+          document.getElementById("currentMode").textContent = data.current_mode || "Unknown";
+          
+          // Update last update timestamp
+          if (data.last_update) {
+            const lastUpdate = new Date(data.last_update);
+            document.getElementById("lastUpdate").textContent = lastUpdate.toLocaleTimeString();
+          }
+        }
+      }, (error) => {
+        console.error("❌ Firebase read failed:", error);
+      });
+
+      // Reset buttons - write directly to the status object
+      document.getElementById("resetPillBtn").onclick = () => {
+        statusRef.update({
+          "pill_count": 100
+        });
+        console.log("💊 Pill count reset to 100");
       };
 
-      // Pill Count
-      refs.pill.on("value", snap => document.getElementById("pillCount").textContent = snap.val());
-      document.getElementById("resetPillBtn").onclick = () => refs.pill.set(100);
-
-      // Medicine Count
-      refs.med.on("value", snap => document.getElementById("medCount").textContent = snap.val());
-      document.getElementById("resetMedBtn").onclick = () => refs.med.set(100);
-
-      // LED 1
-      refs.led0.on("value", snap => updateLED("led0Status", snap.val(), "red"));
-      document.getElementById("toggleLed0").onclick = () => toggleLED(refs.led0);
-
-      // LED 2
-      refs.led1.on("value", snap => updateLED("led1Status", snap.val(), "green"));
-      document.getElementById("toggleLed1").onclick = () => toggleLED(refs.led1);
+      document.getElementById("resetMedBtn").onclick = () => {
+        statusRef.update({
+          "med_count": 100
+        });
+        console.log("🧴 Medicine count reset to 100");
+      };
     }
 
-    // Helper: Update LED display
-    function updateLED(id, state, color) {
-      const el = document.getElementById(id);
-      el.textContent = state ? "ON" : "OFF";
-      el.style.color = state ? color : "gray";
-    }
-
-    // Helper: Toggle LED value
-    function toggleLED(ref) {
-      ref.get().then(snap => ref.set(!snap.val()));
+    function updateLED(statusId, indicatorId, state) {
+      const isOn = Boolean(state);
+      document.getElementById(statusId).textContent = isOn ? "ON" : "OFF";
+      document.getElementById(statusId).style.color = isOn ? "var(--success)" : "var(--gray)";
+      document.getElementById(indicatorId).className = `status-indicator ${isOn ? 'status-on' : 'status-off'}`;
     }
 
     // ✅ Logout
     document.getElementById("logoutBtn").onclick = () => {
-      dashboard.style.display = "none";
-      loginForm.style.display = "block";
-      document.getElementById("email").value = "";
-      document.getElementById("password").value = "";
+      if (confirm("Are you sure you want to logout?")) {
+        // Remove Firebase listeners
+        if (statusRef && statusRef.off) {
+          statusRef.off();
+        }
+        
+        dashboard.style.display = "none";
+        loginForm.style.display = "block";
+        document.getElementById("email").value = "";
+        document.getElementById("password").value = "";
+      }
     };
+
+    // Test Firebase connection on load
+    console.log("🚀 Firebase initialized with config:", firebaseConfig);
   </script>
 </body>
 </html>
