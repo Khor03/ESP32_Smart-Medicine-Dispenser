@@ -197,24 +197,6 @@
       transition: width 0.3s ease;
     }
 
-    .btn-reset {
-      background-color: var(--primary);
-      color: white;
-      padding: 12px 24px;
-      border: none;
-      border-radius: 8px;
-      font-size: 1rem;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      width: 100%;
-      margin-top: 10px;
-    }
-
-    .btn-reset:hover {
-      background-color: var(--primary-dark);
-      transform: translateY(-2px);
-    }
-
     .status-indicator {
       display: inline-block;
       width: 15px;
@@ -331,7 +313,6 @@
           <div class="progress-bar">
             <div class="progress-fill" id="pillProgress" style="width: 0%"></div>
           </div>
-          <button class="btn-reset" id="resetPillBtn">Reset to 100</button>
         </div>
 
         <!-- Medicine Solution Card -->
@@ -343,7 +324,6 @@
           <div class="progress-bar">
             <div class="progress-fill" id="medProgress" style="width: 0%"></div>
           </div>
-          <button class="btn-reset" id="resetMedBtn">Reset to 100</button>
         </div>
 
         <!-- LED 1 Card -->
@@ -464,21 +444,21 @@
         if (data) {
           console.log("📦 Received data from Firebase:", data);
           
-          // Update pill count
-          const pillCount = data.pill_count || 0;
+          // Update pill count - using the new field name
+          const pillCount = data["Pill percentage"] || 0;
           document.getElementById("pillCount").textContent = pillCount;
           document.getElementById("pillProgress").style.width = `${pillCount}%`;
           
-          // Update medicine count
-          const medCount = data.med_count || 0;
+          // Update medicine count - using the new field name
+          const medCount = data["Medicine solution percentage"] || 0;
           document.getElementById("medCount").textContent = medCount;
           document.getElementById("medProgress").style.width = `${medCount}%`;
           
-          // Update LED statuses
-          updateLED("led0Status", "led0Indicator", data.led0);
-          updateLED("led1Status", "led1Indicator", data.led1);
+          // Update LED statuses - using the new field names
+          updateLED("led0Status", "led0Indicator", data.Led0);
+          updateLED("led1Status", "led1Indicator", data.Led1);
           
-          // Update system information
+          // Update system information - using the new field names
           document.getElementById("currentUser").textContent = data.current_user || "Unknown";
           document.getElementById("currentMode").textContent = data.current_mode || "Unknown";
           
@@ -491,21 +471,6 @@
       }, (error) => {
         console.error("❌ Firebase read failed:", error);
       });
-
-      // Reset buttons - write directly to the status object
-      document.getElementById("resetPillBtn").onclick = () => {
-        statusRef.update({
-          "pill_count": 100
-        });
-        console.log("💊 Pill count reset to 100");
-      };
-
-      document.getElementById("resetMedBtn").onclick = () => {
-        statusRef.update({
-          "med_count": 100
-        });
-        console.log("🧴 Medicine count reset to 100");
-      };
     }
 
     function updateLED(statusId, indicatorId, state) {
