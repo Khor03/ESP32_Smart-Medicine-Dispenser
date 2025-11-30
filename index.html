@@ -208,44 +208,6 @@
     .status-on { background-color: var(--success); }
     .status-off { background-color: var(--gray); }
 
-    .system-info {
-      background: white;
-      border-radius: 15px;
-      padding: 20px;
-      margin-top: 20px;
-      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-    }
-
-    .system-info h3 {
-      color: var(--dark);
-      margin-bottom: 15px;
-    }
-
-    .info-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-      gap: 15px;
-    }
-
-    .info-item {
-      text-align: center;
-      padding: 10px;
-      background: var(--light);
-      border-radius: 8px;
-    }
-
-    .info-label {
-      font-size: 0.9rem;
-      color: var(--gray);
-      margin-bottom: 5px;
-    }
-
-    .info-value {
-      font-size: 1.1rem;
-      font-weight: bold;
-      color: var(--primary);
-    }
-
     footer {
       text-align: center;
       color: white;
@@ -267,10 +229,6 @@
       
       h1 {
         font-size: 2rem;
-      }
-      
-      .info-grid {
-        grid-template-columns: 1fr;
       }
     }
   </style>
@@ -346,25 +304,6 @@
             <span id="led1Status">OFF</span>
           </div>
           <div class="card-subtitle">Success indicator LED status</div>
-        </div>
-      </div>
-
-      <!-- System Information -->
-      <div class="system-info">
-        <h3>📊 System Information</h3>
-        <div class="info-grid">
-          <div class="info-item">
-            <div class="info-label">Current User ID</div>
-            <div class="info-value" id="currentUser">-</div>
-          </div>
-          <div class="info-item">
-            <div class="info-label">Current Mode</div>
-            <div class="info-value" id="currentMode">-</div>
-          </div>
-          <div class="info-item">
-            <div class="info-label">Last Update</div>
-            <div class="info-value" id="lastUpdate">-</div>
-          </div>
         </div>
       </div>
 
@@ -457,16 +396,6 @@
           // Update LED statuses - using the new field names
           updateLED("led0Status", "led0Indicator", data.Led0);
           updateLED("led1Status", "led1Indicator", data.Led1);
-          
-          // Update system information - using the new field names
-          document.getElementById("currentUser").textContent = data.current_user || "Unknown";
-          document.getElementById("currentMode").textContent = data.current_mode || "Unknown";
-          
-          // Update last update timestamp
-          if (data.last_update) {
-            const lastUpdate = new Date(data.last_update);
-            document.getElementById("lastUpdate").textContent = lastUpdate.toLocaleTimeString();
-          }
         }
       }, (error) => {
         console.error("❌ Firebase read failed:", error);
